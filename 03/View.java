@@ -139,6 +139,7 @@ class View {
 		}
 	}
 
+	// TODO: documentation
 	public synchronized void removeDuplicates() {
 		for (int i = 0; i < this.nodes.size(); i++) {
 			for (int j = i + 1; j < this.nodes.size(); j++) {
