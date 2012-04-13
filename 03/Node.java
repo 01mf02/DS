@@ -1,5 +1,3 @@
-/* Kommentar von David */
-
 class Node {
 	private final String address;
 	private int age;
@@ -25,7 +23,7 @@ class Node {
 	public void age() {
 		this.age++;
 	}
-	
+
 	public boolean compareAddress(Node node) {
 		if (this.address.equals(node.getAddress())) {
 			return true;
