@@ -26,62 +26,52 @@ public class ServiceLocator {
 		this.socket = socket;
 	}
 
-	/**
-	 * @return
-	 */
-	public Node locateAnnouncer() {
+	public Node locateAnnouncer() throws IOException {
 
-		try {
-			// DatagramSocket in_socket = new DatagramSocket(response_port);
-			// DatagramSocket out_socket = new DatagramSocket();
+		// DatagramSocket in_socket = new DatagramSocket(response_port);
+		// DatagramSocket out_socket = new DatagramSocket();
 
-			InetAddress broadcast_address = InetAddress
-					.getByName(broadcast_address_str);
+		InetAddress broadcast_address = InetAddress
+				.getByName(broadcast_address_str);
 
-			String message = "Ping," + Integer.toString(response_port) + "\n";
-			byte[] message_data = message.getBytes();
+		String message = "Ping," + Integer.toString(response_port) + "\n";
+		byte[] message_data = message.getBytes();
 
-			DatagramPacket packet = new DatagramPacket(message_data,
-					message_data.length, broadcast_address, message_port);
-			this.socket.send(packet);
+		DatagramPacket packet = new DatagramPacket(message_data,
+				message_data.length, broadcast_address, message_port);
+		this.socket.send(packet);
 
-			packet = new DatagramPacket(new byte[1024], 1024);
-			this.socket.receive(packet);
-			// identify sender
-			InetAddress sender_address = packet.getAddress();
-			int sender_port = packet.getPort();
+		packet = new DatagramPacket(new byte[1024], 1024);
+		this.socket.receive(packet);
+		// identify sender
+		InetAddress sender_address = packet.getAddress();
+		int sender_port = packet.getPort();
 
-			// get sent message
-			int message_len = packet.getLength();
-			message_data = packet.getData();
-			// convert to string, removing trailing newline
-			message = new String(message_data, 0, message_len - 1);
+		// get sent message
+		int message_len = packet.getLength();
+		message_data = packet.getData();
+		// convert to string, removing trailing newline
+		message = new String(message_data, 0, message_len - 1);
 
-			// parse the message
-			String[] st = message.split(",");
+		System.out.println("Message from " + sender_address + " on port "
+				+ sender_port + " of length " + message_len + ": " + message
+				+ ".");
 
-			// check if message has the right format
-			if ((st.length != 2) || !st[0].equals("Pong")) {
-				System.out.println("Message Format Error");
-				return null;
-			}
+		// parse the message
+		String[] st = message.split(",");
 
-			// create node to return
-			int port = Integer.parseInt(st[1]);
-			Node node = new Node(sender_address.getHostAddress(), port, 0);
-
-			System.out.println("Message from " + sender_address + " on port "
-					+ sender_port + " of length " + message_len + ": "
-					+ message + ".");
-
-			return node;
-		} catch (SocketException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		// check if message has the right format
+		if ((st.length != 2) || !st[0].equals("Pong")) {
+			System.out.println("ServiceLocator: Message format error");
+			return null;
 		}
 
-		return null;
+		// create node to return
+		int port = Integer.parseInt(st[1]);
+		System.out.println("First token: " + st[1]);
+		Node node = new Node(sender_address.getHostAddress(), port, 0);
+
+		return node;
 	}
 
 	/**
@@ -103,7 +93,11 @@ public class ServiceLocator {
 			socket = new DatagramSocket(4712);
 			ServiceLocator loc = new ServiceLocator("138.232.94.255", 4711,
 					socket);
-			loc.locateAnnouncer();
+			try {
+				loc.locateAnnouncer();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

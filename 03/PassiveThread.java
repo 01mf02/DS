@@ -35,9 +35,27 @@ public class PassiveThread extends Thread {
 				this.sock.receive(p);
 				if (this.PULL_MODE) {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
+
+					// get random node
 					Node n = this.view.selectNode();
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), n.getPort(), buf_out);
+					// if no nodes exist yet
+					if (n == null) {
+						// find node via broadcast on local network
+						ServiceLocator loc = new ServiceLocator(
+								Application.BROADCAST_ADDR,
+								Application.BROADCAST_PORT, this.sock);
+						try {
+							n = loc.locateAnnouncer();
+						} catch (SocketTimeoutException e) {
+							continue;
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()), n.getPort(),
+							buf_out);
 				}
 				this.view.mergeViews(SendView.unpackData(p), Application.H,
 						Application.S, Application.C);

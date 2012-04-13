@@ -61,7 +61,8 @@ public class ServiceAnnouncer extends Thread {
 
 					// check if message has the right format
 					if ((st.length != 2) || !st[0].equals("Ping")) {
-						System.out.println("Message Format Error");
+						System.out
+								.println("ServiceAnnouncer: Message format error");
 						continue;
 					}
 

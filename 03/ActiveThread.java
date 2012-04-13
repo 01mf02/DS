@@ -31,7 +31,13 @@ class ActiveThread extends Thread {
 				ServiceLocator loc = new ServiceLocator(
 						Application.BROADCAST_ADDR, Application.BROADCAST_PORT,
 						this.sock);
-				n = loc.locateAnnouncer();
+				try {
+					n = loc.locateAnnouncer();
+				} catch (SocketTimeoutException e) {
+					continue;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
 			try {
