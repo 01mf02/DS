@@ -12,16 +12,18 @@ public class ServiceLocator {
 	private final int message_port;
 	private final int response_port;
 	private final String broadcast_address_str;
+	private final DatagramSocket socket;
 
 	/**
 	 * @param broadcast
 	 * @param out_port
 	 * @param in_port
 	 */
-	public ServiceLocator(String broadcast, int out_port, int in_port) {
+	public ServiceLocator(String broadcast, int out_port, DatagramSocket socket) {
 		this.message_port = out_port;
-		this.response_port = in_port;
+		this.response_port = socket.getLocalPort();
 		this.broadcast_address_str = broadcast;
+		this.socket = socket;
 	}
 
 	/**
@@ -30,8 +32,8 @@ public class ServiceLocator {
 	public Node locateAnnouncer() {
 
 		try {
-			DatagramSocket in_socket = new DatagramSocket(response_port);
-			DatagramSocket out_socket = new DatagramSocket();
+			// DatagramSocket in_socket = new DatagramSocket(response_port);
+			// DatagramSocket out_socket = new DatagramSocket();
 
 			InetAddress broadcast_address = InetAddress
 					.getByName(broadcast_address_str);
@@ -41,10 +43,10 @@ public class ServiceLocator {
 
 			DatagramPacket packet = new DatagramPacket(message_data,
 					message_data.length, broadcast_address, message_port);
-			out_socket.send(packet);
+			this.socket.send(packet);
 
 			packet = new DatagramPacket(new byte[1024], 1024);
-			in_socket.receive(packet);
+			this.socket.receive(packet);
 			// identify sender
 			InetAddress sender_address = packet.getAddress();
 			int sender_port = packet.getPort();
@@ -86,7 +88,23 @@ public class ServiceLocator {
 
 		ServiceAnnouncer s = new ServiceAnnouncer(4711, 4000);
 		s.start();
-		ServiceLocator loc = new ServiceLocator("138.232.94.255", 4711, 4712);
-		Node node = loc.locateAnnouncer();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
+		DatagramSocket socket;
+		try {
+			socket = new DatagramSocket(4712);
+			ServiceLocator loc = new ServiceLocator("138.232.94.255", 4711,
+					socket);
+			loc.locateAnnouncer();
+		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 }

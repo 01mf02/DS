@@ -32,7 +32,7 @@ public class ServiceAnnouncer extends Thread {
 
 		try {
 			DatagramSocket in_socket = new DatagramSocket(in_port);
-			DatagramSocket out_socket = new DatagramSocket();
+			// DatagramSocket out_socket = new DatagramSocket();
 
 			while (running) {
 
@@ -65,7 +65,7 @@ public class ServiceAnnouncer extends Thread {
 					byte[] response_data = response.getBytes();
 					packet = new DatagramPacket(response_data,
 							response_data.length, sender_address, response_port);
-					out_socket.send(packet);
+					in_socket.send(packet);
 				} catch (NumberFormatException e) {
 					System.out.println("Message is not an integer.");
 				}
