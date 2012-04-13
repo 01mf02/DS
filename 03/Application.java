@@ -12,29 +12,13 @@ import java.util.ArrayList;
  */
 public class Application {
 
-	/**
-	 * 
-	 */
 	public static final int H = 5;
-	/**
-	 * 
-	 */
 	public static final int S = 5;
-	/**
-	 * 
-	 */
 	public static final int C = 5;
-	/**
-	 * 
-	 */
-	public static final int PORT = 12347;
-	/**
-	 * 
-	 */
+	public static final int PORT = 12346;
 	public static final int MAX_CAP = 10;
-	/**
-	 * 
-	 */
+	public static final String BROADCAST_ADDR = "138.232.94.255";
+	public static final String BROADCAST_PORT = "5000";
 
 	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
 			.getBytes().length;
@@ -49,6 +33,7 @@ public class Application {
 	 */
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
+
 		DatagramSocket sock = null;
 
 		try {
@@ -66,11 +51,15 @@ public class Application {
 				System.out.println("To stop the application, type: quit");
 			} while (!in.readLine().equals("quit"));
 
+			System.out.println("Quitting application ...");
+
 			// if the user typed "quit" wait until the threads have ended
 			aThread.endThread();
 			pThread.endThread();
 			aThread.join();
 			pThread.join();
+
+			System.out.println("Threads cleaned up");
 		} catch (SocketException e) {
 			e.printStackTrace();
 			System.exit(-1);

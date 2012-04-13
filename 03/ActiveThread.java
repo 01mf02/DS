@@ -16,6 +16,7 @@ class ActiveThread extends Thread {
 	public ActiveThread(DatagramSocket sock, View view) {
 		this.sock = sock;
 		this.view = view;
+
 		System.out.println("ActiveThread constructed.");
 	}
 
@@ -23,15 +24,22 @@ class ActiveThread extends Thread {
 	public void run() {
 		while (this.running) {
 			Node n = this.view.selectNode();
+			if (n == null) {
+				// TODO: scan with ServiceAnnouncer
+				continue;
+			}
+
 			try {
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, buf_out);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()),
+							Application.PORT, buf_out);
 				} else {
 					// send empty view to trigger response
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, null);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()),
+							Application.PORT, null);
 				}
 				if (this.PULL_MODE) {
 					// + 1 because of the ":" delimiter
