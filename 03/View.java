@@ -50,12 +50,13 @@ class View {
 	}
 
 	// get the buffer to be sent to other peers
-	public View getBuffer() {
+	public View getBuffer(int port) {
 		View buf = new View();
 		try {
 			// add your own IP-address
 			buf.getNodes().add(
-					new Node(InetAddress.getLocalHost().getHostAddress(), 0));
+					new Node(InetAddress.getLocalHost().getHostAddress(), port,
+							0));
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
@@ -71,13 +72,17 @@ class View {
 		System.out.println("----------------------------");
 		while (itr.hasNext()) {
 			Node element = itr.next();
-			System.out.println(element.getAddress() + ' ' + element.getAge());
+			System.out.println(element.getAddress() + ' ' + element.getPort()
+					+ ' ' + element.getAge());
 		}
 		System.out.println("----------------------------");
 	}
 
-	// get a random node from the array
+	// get a random node from the array -- if array is empty, return null
 	public Node selectNode() {
+		if (this.nodes.size() == 0)
+			return null;
+		
 		int position = this.rand.nextInt(this.nodes.size());
 		return this.nodes.get(position);
 	}
@@ -160,7 +165,7 @@ class View {
 	public synchronized void removeDuplicates() {
 		for (int i = 0; i < this.nodes.size(); i++) {
 			for (int j = i + 1; j < this.nodes.size(); j++) {
-				if (this.nodes.get(i).compareAddress(this.nodes.get(j))) {
+				if (this.nodes.get(i).compareAddressAndPort(this.nodes.get(j))) {
 					/* remove the older node */
 					if (this.nodes.get(i).compareAge(this.nodes.get(j))) {
 						this.nodes.remove(i);
