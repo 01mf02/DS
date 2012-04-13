@@ -1,3 +1,5 @@
+/* Kommentar von David */
+
 class Node {
 	private final String address;
 	private int age;
