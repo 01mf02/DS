@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
@@ -29,7 +30,11 @@ public class SendView {
 			node = nodes.get(i);
 			// append the address
 			b.append(node.getAddress());
-			// append a delimiter that parts the address and the age
+			// append a delimiter that parts the address and the port
+			b.append(delim);
+			// append the port
+			b.append(node.getPort());
+			// append a delimiter that parts the port and the age
 			b.append(delim);
 			// append the age
 			b.append(node.getAge());
@@ -70,25 +75,31 @@ public class SendView {
 		ArrayList<Node> nodes = new ArrayList<Node>();
 		Node node;
 		String addr;
+		int port;
 		int age;
 		while (st.hasMoreTokens()) {
 			addr = st.nextToken();
+			port = Integer.parseInt(st.nextToken());
 			age = Integer.parseInt(st.nextToken());
-			node = new Node(addr, age);
+			node = new Node(addr, port, age);
 			nodes.add(node);
 		}
 		return new View(nodes);
 	}
 
-	/*
-	 * public static void main(String[] args) throws UnknownHostException {
-	 * String str = "1.1.1.1 0;2.2.2.2 0;3.3.3.3 1;:"; DatagramPacket p = new
-	 * DatagramPacket(str.getBytes(), str.getBytes().length,
-	 * InetAddress.getByName("127.0.0.1"), 1222); View view = unpackData(p);
-	 * ArrayList<Node> nodes = view.getNodes(); for (int i = 0; i <
-	 * nodes.size(); i++) { System.out.println(nodes.get(i).getAddress() + " " +
-	 * nodes.get(i).getAge()); }
-	 * 
-	 * System.out.println(new String(packData(view))); }
-	 */
+	// for test purposes
+	public static void main(String[] args) throws UnknownHostException {
+		String str = "1.1.1.1 123 0;2.2.2.2 1234 0;3.3.3.3 12345 1;:";
+		DatagramPacket p = new DatagramPacket(str.getBytes(),
+				str.getBytes().length, InetAddress.getByName("127.0.0.1"), 1222);
+		View view = unpackData(p);
+		ArrayList<Node> nodes = view.getNodes();
+		for (int i = 0; i < nodes.size(); i++) {
+			System.out.println(nodes.get(i).getAddress() + " "
+					+ nodes.get(i).getPort() + " " + nodes.get(i).getAge());
+		}
+
+		System.out.println(new String(packData(view)));
+	}
+
 }

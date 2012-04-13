@@ -24,15 +24,13 @@ class ActiveThread extends Thread {
 			Node n = this.view.selectNode();
 			try {
 				if (this.PUSH_MODE) {
-					View buf_out = this.view.getBuffer();
-					SendView.sendData(this.sock,
-							InetAddress.getByName(n.getAddress()),
-							Application.PORT, buf_out);
+					View buf_out = this.view.getBuffer(this.sock.getPort());
+					SendView.sendData(this.sock, InetAddress.getByName(n
+							.getAddress()), Application.PORT, buf_out);
 				} else {
 					// send empty view to trigger response
-					SendView.sendData(this.sock,
-							InetAddress.getByName(n.getAddress()),
-							Application.PORT, null);
+					SendView.sendData(this.sock, InetAddress.getByName(n
+							.getAddress()), Application.PORT, null);
 				}
 				if (this.PULL_MODE) {
 					// + 1 because of the ":" delimiter
