@@ -27,7 +27,8 @@ public class ServiceLocator {
 	/**
 	 * @return
 	 */
-	public InetAddress locateAnnouncer() {
+	public Node locateAnnouncer() {
+
 		try {
 			DatagramSocket in_socket = new DatagramSocket(response_port);
 			DatagramSocket out_socket = new DatagramSocket();
@@ -35,7 +36,7 @@ public class ServiceLocator {
 			InetAddress broadcast_address = InetAddress
 					.getByName(broadcast_address_str);
 
-			String message = Integer.toString(response_port) + "\n";
+			String message = "Ping," + Integer.toString(response_port) + "\n";
 			byte[] message_data = message.getBytes();
 
 			DatagramPacket packet = new DatagramPacket(message_data,
@@ -54,11 +55,21 @@ public class ServiceLocator {
 			// convert to string, removing trailing newline
 			message = new String(message_data, 0, message_len - 1);
 
+			// parse the message
+			String[] st = message.split(",");
+
+			// create node to return
+			Node node;
+			int port;
+			port = Integer.parseInt(st[1]);
+
+			node = new Node(sender_address.toString(), port, 0);
+
 			System.out.println("Message from " + sender_address + " on port "
 					+ sender_port + " of length " + message_len + ": "
 					+ message + ".");
 
-			return sender_address;
+			return node;
 		} catch (SocketException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -72,7 +83,10 @@ public class ServiceLocator {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+
+		ServiceAnnouncer s = new ServiceAnnouncer(4711, 4000);
+		s.start();
 		ServiceLocator loc = new ServiceLocator("138.232.94.255", 4711, 4712);
-		InetAddress address = loc.locateAnnouncer();
+		Node node = loc.locateAnnouncer();
 	}
 }
