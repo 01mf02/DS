@@ -33,7 +33,8 @@ public class Application {
 	/**
 	 * 
 	 */
-	public static final int MAX_BYTES = "255.255.255.255 10000;".getBytes().length;
+	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
+			.getBytes().length;
 
 	/**
 	 * @param args
