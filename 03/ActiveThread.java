@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 class ActiveThread extends Thread {
@@ -36,14 +37,12 @@ class ActiveThread extends Thread {
 			try {
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
-					SendView.sendData(this.sock,
-							InetAddress.getByName(n.getAddress()),
-							Application.PORT, buf_out);
+					SendView.sendData(this.sock, InetAddress.getByName(n
+							.getAddress()), Application.PORT, buf_out);
 				} else {
 					// send empty view to trigger response
-					SendView.sendData(this.sock,
-							InetAddress.getByName(n.getAddress()),
-							Application.PORT, null);
+					SendView.sendData(this.sock, InetAddress.getByName(n
+							.getAddress()), Application.PORT, null);
 				}
 				if (this.PULL_MODE) {
 					// + 1 because of the ":" delimiter
@@ -61,6 +60,8 @@ class ActiveThread extends Thread {
 
 			} catch (UnknownHostException e) {
 				e.printStackTrace();
+			} catch (SocketTimeoutException e) {
+				continue;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

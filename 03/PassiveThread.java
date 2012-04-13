@@ -1,8 +1,8 @@
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketTimeoutException;
 
 /**
  * @author csak7117
@@ -42,6 +42,8 @@ public class PassiveThread extends Thread {
 				this.view.mergeViews(SendView.unpackData(p), Application.H,
 						Application.S, Application.C);
 				this.view.age();
+			} catch (SocketTimeoutException e) {
+				continue;
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

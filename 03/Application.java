@@ -14,10 +14,10 @@ public class Application {
 	public static final int H = 5;
 	public static final int S = 5;
 	public static final int C = 5;
-	public static final int PORT = 12345;
+	public static final int PORT = 12347;
 	public static final int MAX_CAP = 10;
 	public static final String BROADCAST_ADDR = "138.232.94.255";
-	public static final int BROADCAST_PORT = 5000;
+	public static final int BROADCAST_PORT = 5200;
 
 	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
 			.getBytes().length;
