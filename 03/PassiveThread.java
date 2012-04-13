@@ -3,13 +3,21 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 
+/**
+ * @author csak7117
+ * 
+ */
 public class PassiveThread extends Thread {
 
 	private final boolean PULL_MODE = true;
 	private boolean running = true;
 	private final DatagramSocket sock;
-	private View view;
+	private final View view;
 
+	/**
+	 * @param sock
+	 * @param view
+	 */
 	public PassiveThread(DatagramSocket sock, View view) {
 		this.sock = sock;
 		this.view = view;
@@ -27,10 +35,12 @@ public class PassiveThread extends Thread {
 				if (this.PULL_MODE) {
 					View buf_out = this.view.getBuffer();
 					Node n = this.view.selectNode();
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, buf_out);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()),
+							Application.PORT, buf_out);
 				}
-				this.view.mergeViews(SendView.unpackData(p));
+				this.view.mergeViews(SendView.unpackData(p), Application.H,
+						Application.S, Application.C);
 				this.view.age();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -38,6 +48,9 @@ public class PassiveThread extends Thread {
 		}
 	}
 
+	/**
+	 * 
+	 */
 	public void endThread() {
 		this.running = false;
 	}

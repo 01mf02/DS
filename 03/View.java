@@ -20,7 +20,6 @@ class View {
 
 		ArrayList<Node> res = new ArrayList<Node>();
 		for (int i = 0; i < 10; i++) {
-			String a = "" + i;
 			res.add(i, new Node("test" + i, i));
 		}
 

@@ -18,18 +18,21 @@ class ActiveThread extends Thread {
 		System.out.println("ActiveThread constructed.");
 	}
 
+	@Override
 	public void run() {
 		while (this.running) {
 			Node n = this.view.selectNode();
 			try {
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer();
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, buf_out);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()),
+							Application.PORT, buf_out);
 				} else {
 					// send empty view to trigger response
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, null);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()),
+							Application.PORT, null);
 				}
 				if (this.PULL_MODE) {
 					// + 1 because of the ":" delimiter
@@ -38,10 +41,10 @@ class ActiveThread extends Thread {
 					DatagramPacket p = new DatagramPacket(buf_in, buf_in.length);
 					this.sock.receive(p);
 					View v = SendView.unpackData(p);
-					
-					
+
 					// TODO: give more parameters H, c, S, ...
-					this.view.mergeViews(v);
+					this.view.mergeViews(v, Application.H, Application.S,
+							Application.C);
 					this.view.age();
 				}
 

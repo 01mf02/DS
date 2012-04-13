@@ -5,12 +5,22 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
+/**
+ * @author csak7117
+ * 
+ */
 public class SendView {
 
-	public static final String delimEntries = ";";
-	public static final String delim = " ";
-	public static final String delimPacket = ":";
+	private static final String delimEntries = ";";
 
+	private static final String delim = " ";
+
+	private static final String delimPacket = ":";
+
+	/**
+	 * @param view
+	 * @return
+	 */
 	public static byte[] packData(View view) {
 		ArrayList<Node> nodes = view.getNodes();
 		StringBuilder b = new StringBuilder();
@@ -31,6 +41,12 @@ public class SendView {
 		return b.substring(0).getBytes();
 	}
 
+	/**
+	 * @param sock
+	 * @param add
+	 * @param port
+	 * @param view
+	 */
 	public synchronized static void sendData(DatagramSocket sock,
 			InetAddress add, int port, View view) {
 		byte[] buf = packData(view);
@@ -43,6 +59,10 @@ public class SendView {
 		}
 	}
 
+	/**
+	 * @param p
+	 * @return
+	 */
 	public static View unpackData(DatagramPacket p) {
 		String data = new String(p.getData(), p.getOffset(), p.getLength());
 		StringTokenizer st = new StringTokenizer(data, delim + delimEntries
@@ -65,8 +85,8 @@ public class SendView {
 	 * String str = "1.1.1.1 0;2.2.2.2 0;3.3.3.3 1;:"; DatagramPacket p = new
 	 * DatagramPacket(str.getBytes(), str.getBytes().length,
 	 * InetAddress.getByName("127.0.0.1"), 1222); View view = unpackData(p);
-	 * ArrayList<Node> nodes = view.getNodes(); for (int i = 0; i < nodes.size();
-	 * i++) { System.out.println(nodes.get(i).getAddress() + " " +
+	 * ArrayList<Node> nodes = view.getNodes(); for (int i = 0; i <
+	 * nodes.size(); i++) { System.out.println(nodes.get(i).getAddress() + " " +
 	 * nodes.get(i).getAge()); }
 	 * 
 	 * System.out.println(new String(packData(view))); }

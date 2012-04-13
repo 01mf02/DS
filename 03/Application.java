@@ -4,13 +4,42 @@ import java.io.InputStreamReader;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+/**
+ * @author csak7117
+ * 
+ */
 public class Application {
 
+	/**
+	 * 
+	 */
 	public static final int H = 5;
+	/**
+	 * 
+	 */
+	public static final int S = 5;
+	/**
+	 * 
+	 */
+	public static final int C = 5;
+	/**
+	 * 
+	 */
 	public static final int PORT = 12347;
+	/**
+	 * 
+	 */
 	public static final int MAX_CAP = 10;
+	/**
+	 * 
+	 */
 	public static final int MAX_BYTES = "255.255.255.255 10000;".getBytes().length;
 
+	/**
+	 * @param args
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 		DatagramSocket sock = null;
