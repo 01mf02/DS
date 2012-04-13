@@ -13,14 +13,13 @@ class View {
 		ArrayList<Node> test = new ArrayList<Node>();
 		for (int i = 0; i < 10; i++) {
 			String a = "" + i;
-			test.add(i, new Node("test" + a, 10 - i));
+			test.add(i, new Node("test" + a, 2 * i, 10 - i));
 		}
-		System.out.println("Alex2");
-		View v1 = new View(test);
 
+		View v1 = new View(test);
 		ArrayList<Node> res = new ArrayList<Node>();
 		for (int i = 0; i < 10; i++) {
-			res.add(i, new Node("test" + i, i));
+			res.add(i, new Node("test" + i, 2 * i, i));
 		}
 
 		View v2 = new View(res);
@@ -80,9 +79,10 @@ class View {
 
 	// get a random node from the array -- if array is empty, return null
 	public Node selectNode() {
-		if (this.nodes.size() == 0)
+		if (this.nodes.size() == 0) {
 			return null;
-		
+		}
+
 		int position = this.rand.nextInt(this.nodes.size());
 		return this.nodes.get(position);
 	}
