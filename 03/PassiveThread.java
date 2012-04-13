@@ -33,11 +33,10 @@ public class PassiveThread extends Thread {
 			try {
 				this.sock.receive(p);
 				if (this.PULL_MODE) {
-					View buf_out = this.view.getBuffer();
+					View buf_out = this.view.getBuffer(this.sock.getPort());
 					Node n = this.view.selectNode();
-					SendView.sendData(this.sock,
-							InetAddress.getByName(n.getAddress()),
-							Application.PORT, buf_out);
+					SendView.sendData(this.sock, InetAddress.getByName(n
+							.getAddress()), Application.PORT, buf_out);
 				}
 				this.view.mergeViews(SendView.unpackData(p), Application.H,
 						Application.S, Application.C);
