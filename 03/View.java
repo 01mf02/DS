@@ -48,6 +48,22 @@ class View {
 		return this.nodes;
 	}
 
+	// get the buffer to be sent to other peers
+	public View getBuffer() {
+		View buf = new View();
+		try {
+			// add your own IP-address
+			buf.getNodes().add(
+					new Node(InetAddress.getLocalHost().getHostAddress(), 0));
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		}
+		this.permute();
+		this.moveDownOldest(Application.H);
+		buf.append(this.head(this.getNodes().size() / 2));
+		return buf;
+	}
+
 	// print the current list of nodes
 	public void printView() {
 		Iterator<Node> itr = this.nodes.iterator();
