@@ -1,4 +1,3 @@
-
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -30,7 +29,8 @@ class ActiveThread extends Thread {
 				// find node via broadcast on local network
 				ServiceLocator loc = new ServiceLocator(
 						Application.BROADCAST_ADDR, Application.BROADCAST_PORT,
-						this.sock.getPort());
+						this.sock.getLocalPort());
+				n = loc.locateAnnouncer();
 			}
 
 			try {
