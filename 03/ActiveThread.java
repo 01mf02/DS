@@ -29,7 +29,7 @@ class ActiveThread extends Thread {
 				// find node via broadcast on local network
 				ServiceLocator loc = new ServiceLocator(
 						Application.BROADCAST_ADDR, Application.BROADCAST_PORT,
-						this.sock.getLocalPort());
+						sock);
 				n = loc.locateAnnouncer();
 			}
 
