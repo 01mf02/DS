@@ -58,6 +58,13 @@ public class ServiceAnnouncer extends Thread {
 
 					// parse the message
 					String[] st = message.split(",");
+
+					// check if message has the right format
+					if ((st.length != 2) || !st[0].equals("Ping")) {
+						System.out.println("Message Format Error");
+						continue;
+					}
+
 					int response_port = Integer.parseInt(st[1]);
 
 					// send back port

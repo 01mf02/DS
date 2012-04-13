@@ -60,12 +60,15 @@ public class ServiceLocator {
 			// parse the message
 			String[] st = message.split(",");
 
-			// create node to return
-			Node node;
-			int port;
-			port = Integer.parseInt(st[1]);
+			// check if message has the right format
+			if ((st.length != 2) || !st[0].equals("Pong")) {
+				System.out.println("Message Format Error");
+				return null;
+			}
 
-			node = new Node(sender_address.getHostAddress(), port, 0);
+			// create node to return
+			int port = Integer.parseInt(st[1]);
+			Node node = new Node(sender_address.getHostAddress(), port, 0);
 
 			System.out.println("Message from " + sender_address + " on port "
 					+ sender_port + " of length " + message_len + ": "
