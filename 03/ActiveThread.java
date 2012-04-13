@@ -5,40 +5,21 @@ import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
-class ActiveThread extends Thread {
+class ActiveThread extends SuperThread {
 	private final boolean PUSH_MODE = true;
 	private final boolean PULL_MODE = false;
 
-	private boolean running = true;
-	private final DatagramSocket sock;
-	private final View view;
-
 	public ActiveThread(DatagramSocket sock, View view) {
-		this.sock = sock;
-		this.view = view;
+		super(sock, view);
 
 		System.out.println("ActiveThread constructed.");
 	}
 
-	@Override
 	public void run() {
-		while (this.running) {
-			// get random node
-			Node n = this.view.selectNode();
-			// if no nodes exist yet
-			if (n == null) {
-				// find node via broadcast on local network
-				ServiceLocator loc = new ServiceLocator(
-						Application.BROADCAST_ADDR, Application.BROADCAST_PORT,
-						this.sock);
-				try {
-					n = loc.locateAnnouncer();
-				} catch (SocketTimeoutException e) {
-					continue;
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
+		while (isRunning()) {
+			Node n = getNode();
+			if (n == null)
+				continue;
 
 			try {
 				if (this.PUSH_MODE) {
@@ -74,9 +55,5 @@ class ActiveThread extends Thread {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	public void endThread() {
-		this.running = false;
 	}
 }

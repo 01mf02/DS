@@ -4,29 +4,16 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
-/**
- * @author csak7117
- * 
- */
-public class PassiveThread extends Thread {
+public class PassiveThread extends SuperThread {
 
 	private final boolean PULL_MODE = true;
-	private boolean running = true;
-	private final DatagramSocket sock;
-	private final View view;
 
-	/**
-	 * @param sock
-	 * @param view
-	 */
 	public PassiveThread(DatagramSocket sock, View view) {
-		this.sock = sock;
-		this.view = view;
+		super(sock, view);
 	}
 
-	@Override
 	public void run() {
-		while (this.running) {
+		while (isRunning()) {
 			// + 1 because of the ":" delimiter
 			byte[] buf_in = new byte[Application.MAX_CAP
 					* Application.MAX_BYTES + 1];
@@ -37,21 +24,9 @@ public class PassiveThread extends Thread {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
 
 					// get random node
-					Node n = this.view.selectNode();
-					// if no nodes exist yet
-					if (n == null) {
-						// find node via broadcast on local network
-						ServiceLocator loc = new ServiceLocator(
-								Application.BROADCAST_ADDR,
-								Application.BROADCAST_PORT, this.sock);
-						try {
-							n = loc.locateAnnouncer();
-						} catch (SocketTimeoutException e) {
-							continue;
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
+					Node n = getNode();
+					if (n == null)
+						continue;
 
 					SendView.sendData(this.sock,
 							InetAddress.getByName(n.getAddress()), n.getPort(),
@@ -66,12 +41,5 @@ public class PassiveThread extends Thread {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * 
-	 */
-	public void endThread() {
-		this.running = false;
 	}
 }

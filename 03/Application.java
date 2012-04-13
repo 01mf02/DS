@@ -15,11 +15,14 @@ public class Application {
 	public static final int H = 5;
 	public static final int S = 5;
 	public static final int C = 5;
-	public static final int BASE_PORT = 12347;
 	public static final int MAX_CAP = 10;
-	public static final String BROADCAST_ADDR = "138.232.94.255";
-	public static final int BROADCAST_PORT = 5200;
 
+	// broadcast address and port where broadcast should be sent on
+	public static final String BROADCAST_ADDR = "192.168.178.255";
+	public static final int BROADCAST_PORT = 5000;
+
+	// port of the first instance and number of total instances
+	public static final int BASE_PORT = 12345;
 	public static final int INSTANCES = 1;
 
 	public static final int TIMEOUT_MS = 2000;
@@ -31,8 +34,7 @@ public class Application {
 	private static ArrayList<PassiveThread> pthreads = new ArrayList<PassiveThread>();
 	private static ArrayList<DatagramSocket> sockets = new ArrayList<DatagramSocket>();
 
-	public static void main(String[] args) throws IOException,
-			InterruptedException {
+	public static void main(String[] args) {
 
 		ServiceAnnouncer announcer = new ServiceAnnouncer(BROADCAST_PORT,
 				BASE_PORT);
@@ -42,6 +44,7 @@ public class Application {
 			for (int i = 0; i < INSTANCES; i++)
 				initInstance(BASE_PORT + i);
 
+			// run threads in background until user wants to quit
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					System.in));
 			do {
@@ -50,18 +53,26 @@ public class Application {
 
 		} catch (SocketException e) {
 			e.printStackTrace();
-			System.exit(-1);
+		} catch (IOException e) {
+			e.printStackTrace();
 		} finally {
 			System.out.println("Quitting application ...");
-			stopInstances();
-			announcer.endThread();
-			announcer.join();
+
+			// clean up
+			try {
+				stopInstances();
+				announcer.endThread();
+				announcer.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 
 			System.out.println("Threads cleaned up");
 		}
 	}
 
 	private static void initInstance(int port) {
+		// construct socket
 		DatagramSocket socket = null;
 		try {
 			socket = new DatagramSocket(port);
@@ -71,15 +82,16 @@ public class Application {
 			e.printStackTrace();
 		}
 
+		// construct active/passive threads with respective view
 		View view = new View();
 		ActiveThread aThread = new ActiveThread(socket, view);
 		PassiveThread pThread = new PassiveThread(socket, view);
 		aThread.start();
 		pThread.start();
 
+		// add threads and sockets to array list for later disposal
 		athreads.add(aThread);
 		pthreads.add(pThread);
-
 		sockets.add(socket);
 	}
 
