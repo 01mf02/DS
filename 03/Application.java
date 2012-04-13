@@ -4,6 +4,7 @@ import java.io.InputStreamReader;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * @author csak7117
@@ -19,30 +20,23 @@ public class Application {
 	public static final String BROADCAST_ADDR = "138.232.94.255";
 	public static final int BROADCAST_PORT = 5000;
 
+	public static final int INSTANCES = 1;
+
+	public static final int TIMEOUT_MS = 5000;
+
 	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
 			.getBytes().length;
 
-	private ArrayList<Thread> threads;
-	private ArrayList<DatagramSocket> sockets;
+	private static ArrayList<ActiveThread> athreads = new ArrayList<ActiveThread>();
+	private static ArrayList<PassiveThread> pthreads = new ArrayList<PassiveThread>();
+	private static ArrayList<DatagramSocket> sockets = new ArrayList<DatagramSocket>();
 
-	/**
-	 * @param args
-	 * @throws IOException
-	 * @throws InterruptedException
-	 */
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 
-		DatagramSocket sock = null;
-
 		try {
-			sock = new DatagramSocket(PORT);
-
-			View view = new View();
-			ActiveThread aThread = new ActiveThread(sock, view);
-			PassiveThread pThread = new PassiveThread(sock, view);
-			aThread.start();
-			pThread.start();
+			for (int i = 0; i < INSTANCES; i++)
+				initInstance(PORT + i);
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					System.in));
@@ -50,24 +44,59 @@ public class Application {
 				System.out.println("To stop the application, type: quit");
 			} while (!in.readLine().equals("quit"));
 
-			System.out.println("Quitting application ...");
-
-			// if the user typed "quit" wait until the threads have ended
-			aThread.endThread();
-			pThread.endThread();
-			aThread.join();
-			pThread.join();
-
-			System.out.println("Threads cleaned up");
 		} catch (SocketException e) {
 			e.printStackTrace();
 			System.exit(-1);
 		} finally {
-			sock.close();
+			System.out.println("Quitting application ...");
+			stopInstances();
+			System.out.println("Threads cleaned up");
 		}
 	}
 
-	public static void initInstance(int port) {
+	private static void initInstance(int port) {
+		DatagramSocket socket = null;
+		try {
+			socket = new DatagramSocket(port);
+			// sets socket packet reception timeout
+			socket.setSoTimeout(TIMEOUT_MS);
+		} catch (SocketException e) {
+			e.printStackTrace();
+		}
 
+		View view = new View();
+		ActiveThread aThread = new ActiveThread(socket, view);
+		PassiveThread pThread = new PassiveThread(socket, view);
+		aThread.start();
+		pThread.start();
+
+		athreads.add(aThread);
+		pthreads.add(pThread);
+
+		sockets.add(socket);
+	}
+
+	private static void stopInstances() throws InterruptedException {
+		// close active threads
+		Iterator<ActiveThread> aitr = athreads.iterator();
+		while (aitr.hasNext()) {
+			ActiveThread aThread = aitr.next();
+			aThread.endThread();
+			aThread.join();
+		}
+
+		// close passive threads
+		Iterator<PassiveThread> pitr = pthreads.iterator();
+		while (pitr.hasNext()) {
+			PassiveThread pThread = pitr.next();
+			pThread.endThread();
+			pThread.join();
+		}
+
+		// close sockets
+		Iterator<DatagramSocket> sitr = sockets.iterator();
+		while (sitr.hasNext()) {
+			sitr.next().close();
+		}
 	}
 }
