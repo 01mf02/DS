@@ -34,6 +34,10 @@ public class Application {
 	public static void main(String[] args) throws IOException,
 			InterruptedException {
 
+		ServiceAnnouncer announcer = new ServiceAnnouncer(BROADCAST_PORT,
+				BASE_PORT);
+		announcer.start();
+
 		try {
 			for (int i = 0; i < INSTANCES; i++)
 				initInstance(BASE_PORT + i);
@@ -50,6 +54,9 @@ public class Application {
 		} finally {
 			System.out.println("Quitting application ...");
 			stopInstances();
+			announcer.endThread();
+			announcer.join();
+
 			System.out.println("Threads cleaned up");
 		}
 	}

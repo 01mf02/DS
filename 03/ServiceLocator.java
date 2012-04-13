@@ -65,7 +65,7 @@ public class ServiceLocator {
 			int port;
 			port = Integer.parseInt(st[1]);
 
-			node = new Node(sender_address.toString(), port, 0);
+			node = new Node(sender_address.getHostAddress(), port, 0);
 
 			System.out.println("Message from " + sender_address + " on port "
 					+ sender_port + " of length " + message_len + ": "

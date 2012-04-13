@@ -37,6 +37,7 @@ class ActiveThread extends Thread {
 			try {
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
+					System.out.println("Address: " + n.getAddress());
 					SendView.sendData(this.sock,
 							InetAddress.getByName(n.getAddress()), n.getPort(),
 							buf_out);
