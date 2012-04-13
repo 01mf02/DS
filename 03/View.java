@@ -1,4 +1,3 @@
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -29,7 +28,7 @@ class View {
 		System.out.println("***********");
 		v2.printView();
 
-		v1.mergeViews(v2, 5, 6, 7);
+		v1.select(v2, 5, 6, 7);
 
 		v1.printView();
 		// v1.moveDownOldest(2);
@@ -186,25 +185,25 @@ class View {
 		}
 	}
 
+	// remove count random nodes from view
 	public synchronized void removeRandom(int count) {
-
 		while (count > 0) {
 			this.nodes.remove(this.rand.nextInt(this.nodes.size()));
 			count--;
 		}
 	}
 
-	public synchronized void mergeViews(View view, int h, int s, int c) {
+	public synchronized void select(View view, int h, int s, int c) {
 
 		this.append(view);
-		this.printView();
+		// this.printView();
 		this.removeDuplicates();
-		this.printView();
+		// this.printView();
 
 		this.moveDownOldest(Math.min(h, this.nodes.size() - c));
-		this.printView();
+		// this.printView();
 		this.removeHead(Math.min(s, this.nodes.size() - c));
-		this.printView();
+		// this.printView();
 		this.removeRandom(this.nodes.size() - c);
 
 	}

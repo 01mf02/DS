@@ -6,10 +6,6 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-/**
- * @author csak7117
- * 
- */
 public class Application {
 
 	public static final int H = 5;
@@ -26,6 +22,7 @@ public class Application {
 	public static final int INSTANCES = 1;
 
 	public static final int TIMEOUT_MS = 2000;
+	public static final int CYCLE_LENGTH_MS = 1000;
 
 	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
 			.getBytes().length;
@@ -36,6 +33,7 @@ public class Application {
 
 	public static void main(String[] args) {
 
+		// respond to broadcasts and tell senders that we listen on BASE_PORT
 		ServiceAnnouncer announcer = new ServiceAnnouncer(BROADCAST_PORT,
 				BASE_PORT);
 		announcer.start();
