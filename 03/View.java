@@ -88,12 +88,12 @@ class View {
 	}
 
 	// randomize the nodes array
-	public void permute() {
+	public synchronized void permute() {
 		Collections.shuffle(this.nodes);
 	}
 
 	// move down the oldest 'count' elements in the nodes array
-	public void moveDownOldest(int count) {
+	public synchronized void moveDownOldest(int count) {
 		ArrayList<Node> oldest_nodes = new ArrayList<Node>();
 
 		// as long as there are still nodes in the nodes array and the
@@ -148,12 +148,12 @@ class View {
 	}
 
 	// append the nodes from another view to this view
-	public void append(View appendix) {
+	public synchronized void append(View appendix) {
 		this.nodes.addAll(appendix.nodes);
 	}
 
 	// let all nodes age by one
-	public void age() {
+	public synchronized void age() {
 		Iterator<Node> itr = this.nodes.iterator();
 		while (itr.hasNext()) {
 			Node element = itr.next();

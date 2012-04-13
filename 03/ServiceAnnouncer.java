@@ -8,12 +8,21 @@ import java.net.SocketException;
  * @author csak7117
  * 
  */
-public class ServiceAnnouncer {
+public class ServiceAnnouncer extends Thread {
+	private final int message_port;
+
+	/**
+	 * @param port
+	 */
+	public ServiceAnnouncer(int port) {
+		this.message_port = port;
+	}
+
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		int message_port = 4711;
+	@Override
+	public void run() {
 
 		try {
 			DatagramSocket in_socket = new DatagramSocket(message_port);
