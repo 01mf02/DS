@@ -76,8 +76,11 @@ class View {
 		System.out.println("----------------------------");
 	}
 
-	// get a random node from the array
+	// get a random node from the array -- if array is empty, return null
 	public Node selectNode() {
+		if (this.nodes.size() == 0)
+			return null;
+		
 		int position = this.rand.nextInt(this.nodes.size());
 		return this.nodes.get(position);
 	}
