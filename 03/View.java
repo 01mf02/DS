@@ -15,9 +15,9 @@ class View {
 			String a = "" + i;
 			test.add(i, new Node("test" + a, 10 - i));
 		}
-
+		System.out.println("Alex2");
 		View v1 = new View(test);
-		System.out.println("Alex");
+
 		ArrayList<Node> res = new ArrayList<Node>();
 		for (int i = 0; i < 10; i++) {
 			String a = "" + i;
@@ -79,7 +79,7 @@ class View {
 
 	// get a random node from the array
 	public Node selectNode() {
-		int position = rand.nextInt(this.nodes.size());
+		int position = this.rand.nextInt(this.nodes.size());
 		return this.nodes.get(position);
 	}
 
@@ -184,7 +184,7 @@ class View {
 	public synchronized void removeRandom(int count) {
 
 		while (count > 0) {
-			this.nodes.remove(rand.nextInt(this.nodes.size()));
+			this.nodes.remove(this.rand.nextInt(this.nodes.size()));
 			count--;
 		}
 	}
@@ -204,4 +204,3 @@ class View {
 
 	}
 }
-
