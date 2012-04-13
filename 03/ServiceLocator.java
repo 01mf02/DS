@@ -14,11 +14,6 @@ public class ServiceLocator {
 	private final String broadcast_address_str;
 	private final DatagramSocket socket;
 
-	/**
-	 * @param broadcast
-	 * @param out_port
-	 * @param in_port
-	 */
 	public ServiceLocator(String broadcast, int out_port, DatagramSocket socket) {
 		this.message_port = out_port;
 		this.response_port = socket.getLocalPort();
@@ -27,9 +22,6 @@ public class ServiceLocator {
 	}
 
 	public Node locateAnnouncer() throws IOException {
-
-		// DatagramSocket in_socket = new DatagramSocket(response_port);
-		// DatagramSocket out_socket = new DatagramSocket();
 
 		InetAddress broadcast_address = InetAddress
 				.getByName(broadcast_address_str);
@@ -74,18 +66,14 @@ public class ServiceLocator {
 		return node;
 	}
 
-	/**
-	 * @param args
-	 */
 	public static void main(String[] args) {
 
 		ServiceAnnouncer s = new ServiceAnnouncer(4711, 4000);
 		s.start();
 		try {
 			Thread.sleep(1000);
-		} catch (InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 
 		DatagramSocket socket;
@@ -99,7 +87,6 @@ public class ServiceLocator {
 				e.printStackTrace();
 			}
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

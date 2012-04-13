@@ -42,10 +42,10 @@ class ActiveThread extends SuperThread {
 					this.view.age();
 				}
 
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
 			} catch (SocketTimeoutException e) {
 				continue;
+			} catch (UnknownHostException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (InterruptedException e) {

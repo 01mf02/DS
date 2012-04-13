@@ -41,7 +41,7 @@ public class ServiceAnnouncer extends Thread {
 
 				try {
 
-					// parse the message
+					// parse message
 					String[] st = message.split(",");
 
 					// check if message has the right format
