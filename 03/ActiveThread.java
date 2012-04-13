@@ -30,7 +30,7 @@ class ActiveThread extends Thread {
 				// find node via broadcast on local network
 				ServiceLocator loc = new ServiceLocator(
 						Application.BROADCAST_ADDR, Application.BROADCAST_PORT,
-						sock);
+						this.sock);
 				n = loc.locateAnnouncer();
 			}
 
@@ -38,7 +38,7 @@ class ActiveThread extends Thread {
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
 					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, buf_out);
+							.getAddress()), n.getPort(), buf_out);
 				} else {
 					// send empty view to trigger response
 					SendView.sendData(this.sock, InetAddress.getByName(n
