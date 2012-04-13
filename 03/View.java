@@ -15,7 +15,7 @@ class View {
 		}
 
 		View v1 = new View(test);
-
+		System.out.println("Alex");
 		ArrayList<Node> res = new ArrayList<Node>();
 		for (int i = 0; i < 10; i++) {
 			String a = "" + i;
