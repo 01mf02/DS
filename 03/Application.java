@@ -15,14 +15,14 @@ public class Application {
 	public static final int H = 5;
 	public static final int S = 5;
 	public static final int C = 5;
-	public static final int PORT = 12347;
+	public static final int BASE_PORT = 12347;
 	public static final int MAX_CAP = 10;
 	public static final String BROADCAST_ADDR = "138.232.94.255";
 	public static final int BROADCAST_PORT = 5200;
 
 	public static final int INSTANCES = 1;
 
-	public static final int TIMEOUT_MS = 5000;
+	public static final int TIMEOUT_MS = 2000;
 
 	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
 			.getBytes().length;
@@ -36,7 +36,7 @@ public class Application {
 
 		try {
 			for (int i = 0; i < INSTANCES; i++)
-				initInstance(PORT + i);
+				initInstance(BASE_PORT + i);
 
 			BufferedReader in = new BufferedReader(new InputStreamReader(
 					System.in));

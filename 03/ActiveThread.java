@@ -37,12 +37,14 @@ class ActiveThread extends Thread {
 			try {
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.sock.getPort());
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), n.getPort(), buf_out);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()), n.getPort(),
+							buf_out);
 				} else {
 					// send empty view to trigger response
-					SendView.sendData(this.sock, InetAddress.getByName(n
-							.getAddress()), Application.PORT, null);
+					SendView.sendData(this.sock,
+							InetAddress.getByName(n.getAddress()), n.getPort(),
+							null);
 				}
 				if (this.PULL_MODE) {
 					// + 1 because of the ":" delimiter
@@ -52,7 +54,6 @@ class ActiveThread extends Thread {
 					this.sock.receive(p);
 					View v = SendView.unpackData(p);
 
-					// TODO: give more parameters H, c, S, ...
 					this.view.mergeViews(v, Application.H, Application.S,
 							Application.C);
 					this.view.age();
