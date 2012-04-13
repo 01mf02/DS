@@ -22,10 +22,14 @@ class ActiveThread extends Thread {
 	@Override
 	public void run() {
 		while (this.running) {
+			// get random node
 			Node n = this.view.selectNode();
+			// if no nodes exist yet
 			if (n == null) {
-				// TODO: scan with ServiceAnnouncer
-				continue;
+				// find node via broadcast on local network
+				ServiceLocator loc = new ServiceLocator(
+						Application.BROADCAST_ADDR, Application.BROADCAST_PORT,
+						this.sock.getPort());
 			}
 
 			try {
