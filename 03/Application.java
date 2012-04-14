@@ -24,8 +24,11 @@ public class Application {
 	public static final int TIMEOUT_MS = 2000;
 	public static final int CYCLE_LENGTH_MS = 1000;
 
-	public static final int MAX_BYTES = "255.255.255.255 65535 10000;"
+	public static final int MAX_NODE_BYTES = "255.255.255.255 65535 10000;"
 			.getBytes().length;
+	// + 1 because of the ":" delimiter
+	public static final int MAX_PACKAGE_BYTES = Application.MAX_CAP
+			* Application.MAX_NODE_BYTES + 1;
 
 	private static ArrayList<ActiveThread> athreads = new ArrayList<ActiveThread>();
 	private static ArrayList<PassiveThread> pthreads = new ArrayList<PassiveThread>();

@@ -1,6 +1,6 @@
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 
 public class PassiveThread extends SuperThread {
@@ -14,22 +14,15 @@ public class PassiveThread extends SuperThread {
 	public void run() {
 		while (isRunning()) {
 			try {
-				View v = receiveBuffer();
+				DatagramPacket packet = receivePacket();
+				View v = unpackData(packet);
 
 				if (this.PULL_MODE) {
 					View buf_out = this.view.getBuffer(this.socket.getPort());
 
-					// TODO: don't send stuff to random node, but to original
-					// package sender!
-
-					// get random node
-					Node n = getNode();
-					if (n == null)
-						continue;
-
-					sendData(this.socket,
-							InetAddress.getByName(n.getAddress()), n.getPort(),
-							buf_out);
+					// send data to node from which we received original packet
+					sendData(this.socket, packet.getAddress(),
+							packet.getPort(), buf_out);
 				}
 				this.view
 						.select(v, Application.H, Application.S, Application.C);

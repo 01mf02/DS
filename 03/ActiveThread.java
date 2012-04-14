@@ -35,7 +35,7 @@ class ActiveThread extends SuperThread {
 							null);
 				}
 				if (this.PULL_MODE) {
-					View v = receiveBuffer();
+					View v = unpackData(receivePacket());
 
 					this.view.select(v, Application.H, Application.S,
 							Application.C);
