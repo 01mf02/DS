@@ -1,14 +1,7 @@
-
 class Node {
 	private final String address;
 	private final int port;
 	private int age;
-
-	public Node(String address, int port) {
-		this.address = address;
-		this.port = port;
-		this.age = 0;
-	}
 
 	public Node(String address, int port, int age) {
 		this.address = address;

@@ -1,27 +1,31 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.SocketTimeoutException;
 
 public class PassiveThread extends SuperThread {
 
-	private final boolean PULL_MODE = true;
+	private final boolean PULL_MODE = false;
 
-	public PassiveThread(DatagramSocket sock, View view) {
-		super(sock, view);
+	public PassiveThread(SocketManager socket, View view) {
+		super(socket, view);
 	}
 
 	public void run() {
 		while (isRunning()) {
 			try {
 				DatagramPacket packet = receivePacket();
+				// as long as there is no incoming packet, try again
+				if (packet == null)
+					continue;
+
 				View v = unpackData(packet);
 
 				if (this.PULL_MODE) {
-					View buf_out = this.view.getBuffer(this.socket.getPort());
+					View buf_out = this.view.getBuffer(this.socket.getSocket()
+							.getPort());
 
 					// send data to node from which we received original packet
-					sendData(this.socket, packet.getAddress(),
+					sendData(this.socket.getSocket(), packet.getAddress(),
 							packet.getPort(), buf_out);
 				}
 				this.view

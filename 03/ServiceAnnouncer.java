@@ -3,6 +3,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 
 public class ServiceAnnouncer extends Thread {
 	private final int in_port;
@@ -18,12 +19,18 @@ public class ServiceAnnouncer extends Thread {
 	public void run() {
 		try {
 			DatagramSocket socket = new DatagramSocket(in_port);
+			// set timeout so we can end the thread at some point
+			socket.setSoTimeout(Application.TIMEOUT_MS);
 
 			while (running) {
 
 				// wait for request
 				DatagramPacket packet = new DatagramPacket(new byte[1024], 1024);
-				socket.receive(packet);
+				try {
+					socket.receive(packet);
+				} catch (SocketTimeoutException e) {
+					continue;
+				}
 
 				// identify sender
 				InetAddress sender_address = packet.getAddress();

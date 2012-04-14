@@ -1,22 +1,17 @@
 import java.io.IOException;
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
-/**
- * @author csak7117
- * 
- */
 public class ServiceLocator {
 	private final int message_port;
 	private final int response_port;
 	private final String broadcast_address_str;
-	private final DatagramSocket socket;
+	private final SocketManager socket;
 
-	public ServiceLocator(String broadcast, int out_port, DatagramSocket socket) {
+	public ServiceLocator(String broadcast, int out_port, SocketManager socket) {
 		this.message_port = out_port;
-		this.response_port = socket.getLocalPort();
+		this.response_port = socket.getSocket().getLocalPort();
 		this.broadcast_address_str = broadcast;
 		this.socket = socket;
 	}
@@ -31,39 +26,48 @@ public class ServiceLocator {
 
 		DatagramPacket packet = new DatagramPacket(message_data,
 				message_data.length, broadcast_address, message_port);
-		this.socket.send(packet);
+		this.socket.getSocket().send(packet);
 
-		packet = new DatagramPacket(new byte[1024], 1024);
-		this.socket.receive(packet);
-		// identify sender
-		InetAddress sender_address = packet.getAddress();
-		int sender_port = packet.getPort();
+		while (true) {
+			packet = this.socket.getPongPacket();
 
-		// get sent message
-		int message_len = packet.getLength();
-		message_data = packet.getData();
-		// convert to string, removing trailing newline
-		message = new String(message_data, 0, message_len - 1);
+			if (packet == null)
+				continue;
 
-		System.out.println("Message from " + sender_address + " on port "
-				+ sender_port + " of length " + message_len + ": " + message
-				+ ".");
+			// identify sender
+			InetAddress sender_address = packet.getAddress();
+			int sender_port = packet.getPort();
 
-		// parse the message
-		String[] st = message.split(",");
+			// get sent message
+			int message_len = packet.getLength();
+			message_data = packet.getData();
+			// convert to string, removing trailing newline
+			message = new String(message_data, 0, message_len - 1);
 
-		// check if message has the right format
-		if ((st.length != 2) || !st[0].equals("Pong")) {
-			System.out.println("ServiceLocator: Message format error");
-			return null;
+			System.out.println("Message from " + sender_address + " on port "
+					+ sender_port + " of length " + message_len + ": "
+					+ message + ".");
+
+			// parse the message
+			String[] st = message.split(",");
+
+			// check if message has the right format
+			if ((st.length != 2) || !st[0].equals("Pong")) {
+				System.out.println("ServiceLocator: Message format error");
+				return null;
+			}
+
+			// create node to return
+			int port = Integer.parseInt(st[1]);
+			System.out.println("Port: " + port);
+
+			// TODO: check if port equals message_port and sender_address equals
+			// local address, and try again in that case
+
+			Node node = new Node(sender_address.getHostAddress(), port, 0);
+
+			return node;
 		}
-
-		// create node to return
-		int port = Integer.parseInt(st[1]);
-		System.out.println("First token: " + st[1]);
-		Node node = new Node(sender_address.getHostAddress(), port, 0);
-
-		return node;
 	}
 
 	public static void main(String[] args) {
@@ -76,14 +80,20 @@ public class ServiceLocator {
 			e.printStackTrace();
 		}
 
-		DatagramSocket socket;
 		try {
-			socket = new DatagramSocket(4712);
-			ServiceLocator loc = new ServiceLocator("138.232.94.255", 4711,
-					socket);
+			SocketManager socket = new SocketManager(4712);
+			socket.start();
+
+			ServiceLocator loc = new ServiceLocator("127.0.0.1", 4711, socket);
 			try {
 				loc.locateAnnouncer();
+				socket.endThread();
+				s.endThread();
+				socket.join();
+				s.join();
 			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		} catch (SocketException e) {

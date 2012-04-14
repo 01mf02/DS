@@ -1,14 +1,13 @@
 import java.io.IOException;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 class ActiveThread extends SuperThread {
-	private final boolean PUSH_MODE = true;
+	private final boolean PUSH_MODE = false;
 	private final boolean PULL_MODE = false;
 
-	public ActiveThread(DatagramSocket socket, View view) {
+	public ActiveThread(SocketManager socket, View view) {
 		super(socket, view);
 
 		System.out.println("ActiveThread constructed.");
@@ -24,13 +23,14 @@ class ActiveThread extends SuperThread {
 					continue;
 
 				if (this.PUSH_MODE) {
-					View buf_out = this.view.getBuffer(this.socket.getPort());
-					sendData(this.socket,
+					View buf_out = this.view.getBuffer(this.socket.getSocket()
+							.getPort());
+					sendData(this.socket.getSocket(),
 							InetAddress.getByName(n.getAddress()), n.getPort(),
 							buf_out);
 				} else {
 					// send empty view to trigger response
-					sendData(this.socket,
+					sendData(this.socket.getSocket(),
 							InetAddress.getByName(n.getAddress()), n.getPort(),
 							null);
 				}

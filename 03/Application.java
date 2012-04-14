@@ -1,7 +1,6 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -30,9 +29,8 @@ public class Application {
 	public static final int MAX_PACKAGE_BYTES = Application.MAX_CAP
 			* Application.MAX_NODE_BYTES + 1;
 
-	private static ArrayList<ActiveThread> athreads = new ArrayList<ActiveThread>();
-	private static ArrayList<PassiveThread> pthreads = new ArrayList<PassiveThread>();
-	private static ArrayList<DatagramSocket> sockets = new ArrayList<DatagramSocket>();
+	private static ArrayList<SuperThread> sthreads = new ArrayList<SuperThread>();
+	private static ArrayList<SocketManager> sockets = new ArrayList<SocketManager>();
 
 	public static void main(String[] args) {
 
@@ -73,12 +71,11 @@ public class Application {
 	}
 
 	private static void initInstance(int port) {
-		// construct socket
-		DatagramSocket socket = null;
+		SocketManager socket = null;
 		try {
-			socket = new DatagramSocket(port);
-			// sets socket packet reception timeout
-			socket.setSoTimeout(TIMEOUT_MS);
+			// construct socket manager
+			socket = new SocketManager(port);
+			socket.start();
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
@@ -90,33 +87,28 @@ public class Application {
 		aThread.start();
 		pThread.start();
 
-		// add threads and sockets to array list for later disposal
-		athreads.add(aThread);
-		pthreads.add(pThread);
+		// add threads and socket managers to array lists for later disposal
+		sthreads.add(aThread);
+		sthreads.add(pThread);
 		sockets.add(socket);
 	}
 
 	private static void stopInstances() throws InterruptedException {
-		// close active threads
-		Iterator<ActiveThread> aitr = athreads.iterator();
-		while (aitr.hasNext()) {
-			ActiveThread aThread = aitr.next();
-			aThread.endThread();
-			aThread.join();
-		}
-
-		// close passive threads
-		Iterator<PassiveThread> pitr = pthreads.iterator();
-		while (pitr.hasNext()) {
-			PassiveThread pThread = pitr.next();
-			pThread.endThread();
-			pThread.join();
-		}
-
-		// close sockets
-		Iterator<DatagramSocket> sitr = sockets.iterator();
+		// close super threads
+		Iterator<SuperThread> sitr = sthreads.iterator();
 		while (sitr.hasNext()) {
-			sitr.next().close();
+			SuperThread sThread = sitr.next();
+			sThread.endThread();
+			sThread.join();
+		}
+
+		// close sockets and stop socket manager threads
+		Iterator<SocketManager> mitr = sockets.iterator();
+		while (mitr.hasNext()) {
+			SocketManager socket = mitr.next();
+			socket.endThread();
+			socket.join();
+			socket.getSocket().close();
 		}
 	}
 }
