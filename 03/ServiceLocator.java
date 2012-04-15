@@ -19,20 +19,21 @@ public class ServiceLocator {
 	public Node locateAnnouncer() throws IOException {
 
 		InetAddress broadcast_address = InetAddress
-				.getByName(broadcast_address_str);
+				.getByName(this.broadcast_address_str);
 
-		String message = "Ping," + Integer.toString(response_port) + "\n";
+		String message = "Ping," + Integer.toString(this.response_port) + "\n";
 		byte[] message_data = message.getBytes();
 
 		DatagramPacket packet = new DatagramPacket(message_data,
-				message_data.length, broadcast_address, message_port);
+				message_data.length, broadcast_address, this.message_port);
 		this.socket.getSocket().send(packet);
 
 		while (true) {
 			packet = this.socket.getPongPacket();
 
-			if (packet == null)
+			if (packet == null) {
 				continue;
+			}
 
 			// identify sender
 			InetAddress sender_address = packet.getAddress();
@@ -61,8 +62,13 @@ public class ServiceLocator {
 			int port = Integer.parseInt(st[1]);
 			System.out.println("Port: " + port);
 
-			// TODO: check if port equals message_port and sender_address equals
+			// check if port equals message_port and sender_address equals
 			// local address, and try again in that case
+			if ((port == this.message_port)
+					&& packet.getAddress().getHostAddress().equals(
+							InetAddress.getLocalHost().getHostAddress())) {
+				continue;
+			}
 
 			Node node = new Node(sender_address.getHostAddress(), port, 0);
 

@@ -18,7 +18,7 @@ public class Application {
 
 	// port of the first instance and number of total instances
 	public static final int BASE_PORT = 12345;
-	public static final int INSTANCES = 1;
+	public static final int INSTANCES = 2;
 
 	public static final int TIMEOUT_MS = 2000;
 	public static final int CYCLE_LENGTH_MS = 1000;
@@ -40,8 +40,9 @@ public class Application {
 		announcer.start();
 
 		try {
-			for (int i = 0; i < INSTANCES; i++)
+			for (int i = 0; i < INSTANCES; i++) {
 				initInstance(BASE_PORT + i);
+			}
 
 			// run threads in background until user wants to quit
 			BufferedReader in = new BufferedReader(new InputStreamReader(

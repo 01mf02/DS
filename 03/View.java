@@ -9,7 +9,7 @@ class View {
 	private final ArrayList<Node> nodes;
 	private final Random rand = new Random();
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws UnknownHostException {
 		ArrayList<Node> test = new ArrayList<Node>();
 		for (int i = 0; i < 10; i++) {
 			String a = "" + i;
@@ -33,6 +33,10 @@ class View {
 		v1.printView();
 		// v1.moveDownOldest(2);
 		// v1.printView();
+
+		System.out.println("Test select");
+		v1.select(new View(), Application.H, Application.S, Application.C);
+		v1.printView();
 	}
 
 	public View() {

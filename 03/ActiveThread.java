@@ -7,35 +7,37 @@ class ActiveThread extends SuperThread {
 	private final boolean PUSH_MODE = false;
 	private final boolean PULL_MODE = false;
 
+	public static final String TRIGGER = "trigger";
+
 	public ActiveThread(SocketManager socket, View view) {
 		super(socket, view);
 
 		System.out.println("ActiveThread constructed.");
 	}
 
+	@Override
 	public void run() {
-		while (isRunning()) {
+		while (this.isRunning()) {
 			try {
 				sleep(Application.CYCLE_LENGTH_MS);
 
-				Node n = getNode();
-				if (n == null)
+				Node n = this.getNode();
+				if (n == null) {
 					continue;
+				}
 
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.socket.getSocket()
 							.getPort());
-					sendData(this.socket.getSocket(),
-							InetAddress.getByName(n.getAddress()), n.getPort(),
-							buf_out);
+					sendData(this.socket.getSocket(), InetAddress.getByName(n
+							.getAddress()), n.getPort(), buf_out);
 				} else {
 					// send empty view to trigger response
-					sendData(this.socket.getSocket(),
-							InetAddress.getByName(n.getAddress()), n.getPort(),
-							null);
+					sendData(this.socket.getSocket(), InetAddress.getByName(n
+							.getAddress()), n.getPort(), null);
 				}
 				if (this.PULL_MODE) {
-					View v = unpackData(receivePacket());
+					View v = unpackData(this.receivePacket());
 
 					this.view.select(v, Application.H, Application.S,
 							Application.C);

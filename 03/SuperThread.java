@@ -15,7 +15,7 @@ public class SuperThread extends Thread {
 
 	private static final String delimEntries = ";";
 	private static final String delim = " ";
-	private static final String delimPacket = ":";
+	private static final String delimPaket = ":";
 
 	SuperThread(SocketManager socket, View view) {
 		this.socket = socket;
@@ -57,9 +57,11 @@ public class SuperThread extends Thread {
 	}
 
 	public static byte[] packData(View view) {
-		if (view == null)
-			// TODO: return an empty packet here!
-			return null;
+		if (view == null) {
+			// if a trigger should be sent, send the trigger message in
+			// ActiveThread plus the paket delimiter
+			return (ActiveThread.TRIGGER + delimPaket).getBytes();
+		}
 
 		ArrayList<Node> nodes = view.getNodes();
 		StringBuilder b = new StringBuilder();
@@ -80,7 +82,7 @@ public class SuperThread extends Thread {
 			b.append(delimEntries);
 		}
 		// append a last delimiter to signify that all nodes have been sent
-		b.append(delimPacket);
+		b.append(delimPaket);
 		return b.substring(0).getBytes();
 	}
 
@@ -98,12 +100,19 @@ public class SuperThread extends Thread {
 	}
 
 	public static View unpackData(DatagramPacket p) {
-		// TODO: handle empty packet here!
-
 		String data = new String(p.getData(), p.getOffset(), p.getLength());
 		StringTokenizer st = new StringTokenizer(data, delim + delimEntries
-				+ delimPacket, false);
+				+ delimPaket, false);
 		ArrayList<Node> nodes = new ArrayList<Node>();
+
+		if (st.countTokens() == 1) {
+			// if there is only one token, check if it is the trigger paket
+			String msg = st.nextToken();
+			if (msg.equals(ActiveThread.TRIGGER)) {
+				// if it is the trigger paket, return an empty view - not null!
+				return new View();
+			}
+		}
 
 		if (st.countTokens() % 3 != 0) {
 			System.out.println("Failed parsing node data: " + data);
@@ -132,5 +141,9 @@ public class SuperThread extends Thread {
 		}
 
 		System.out.println(new String(packData(view)));
+		System.out.println(InetAddress.getByName("127.0.0.1") == InetAddress
+				.getLocalHost());
+		System.out.println(InetAddress.getByName("10.0.0.56").getHostAddress()
+				.equals(InetAddress.getLocalHost().getHostAddress()));
 	}
 }
