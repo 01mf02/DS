@@ -4,7 +4,7 @@ import java.net.SocketTimeoutException;
 
 public class PassiveThread extends SuperThread {
 
-	private final boolean PULL_MODE = false;
+	private final boolean PULL_MODE = true;
 
 	public PassiveThread(SocketManager socket, View view) {
 		super(socket, view);
@@ -12,7 +12,6 @@ public class PassiveThread extends SuperThread {
 		System.out.println("Passive Thread constructed.");
 	}
 
-	@Override
 	public void run() {
 		while (this.isRunning()) {
 			try {
@@ -26,7 +25,7 @@ public class PassiveThread extends SuperThread {
 
 				if (this.PULL_MODE) {
 					View buf_out = this.view.getBuffer(this.socket.getSocket()
-							.getPort());
+							.getLocalPort());
 
 					// send data to node from which we received original packet
 					sendData(this.socket.getSocket(), packet.getAddress(),
@@ -35,6 +34,9 @@ public class PassiveThread extends SuperThread {
 				this.view
 						.select(v, Application.H, Application.S, Application.C);
 				this.view.age();
+
+				this.view.printView();
+
 			} catch (SocketTimeoutException e) {
 				continue;
 			} catch (IOException e) {

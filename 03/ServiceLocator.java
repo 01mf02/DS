@@ -64,11 +64,10 @@ public class ServiceLocator {
 
 			// check if port equals message_port and sender_address equals
 			// local address, and try again in that case
-			if ((port == this.message_port)
-					&& packet.getAddress().getHostAddress().equals(
-							InetAddress.getLocalHost().getHostAddress())) {
+			if (port == this.message_port
+					&& sender_address.getHostAddress().equals(
+							InetAddress.getLocalHost().getHostAddress()))
 				continue;
-			}
 
 			Node node = new Node(sender_address.getHostAddress(), port, 0);
 

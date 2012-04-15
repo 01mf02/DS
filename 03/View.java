@@ -9,36 +9,6 @@ class View {
 	private final ArrayList<Node> nodes;
 	private final Random rand = new Random();
 
-	public static void main(String[] args) throws UnknownHostException {
-		ArrayList<Node> test = new ArrayList<Node>();
-		for (int i = 0; i < 10; i++) {
-			String a = "" + i;
-			test.add(i, new Node("test" + a, 2 * i, 10 - i));
-		}
-
-		View v1 = new View(test);
-		ArrayList<Node> res = new ArrayList<Node>();
-		for (int i = 0; i < 10; i++) {
-			res.add(i, new Node("test" + i, 2 * i, i));
-		}
-
-		View v2 = new View(res);
-
-		v1.printView();
-		System.out.println("***********");
-		v2.printView();
-
-		v1.select(v2, 5, 6, 7);
-
-		v1.printView();
-		// v1.moveDownOldest(2);
-		// v1.printView();
-
-		System.out.println("Test select");
-		v1.select(new View(), Application.H, Application.S, Application.C);
-		v1.printView();
-	}
-
 	public View() {
 		this.nodes = new ArrayList<Node>();
 	}
@@ -56,13 +26,16 @@ class View {
 	public View getBuffer(int port) {
 		View buf = new View();
 		try {
-			// add your own IP-address
-			buf.getNodes().add(
-					new Node(InetAddress.getLocalHost().getHostAddress(), port,
-							0));
+			// add my own IP address
+			String address = InetAddress.getLocalHost().getHostAddress();
+			Node node = new Node(address, port, 0);
+
+			buf.getNodes().add(node);
+
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
+
 		this.permute();
 		this.moveDownOldest(Application.H);
 		buf.append(this.head(this.getNodes().size() / 2));
@@ -70,7 +43,7 @@ class View {
 	}
 
 	// print the current list of nodes
-	public void printView() {
+	public synchronized void printView() {
 		Iterator<Node> itr = this.nodes.iterator();
 		System.out.println("----------------------------");
 		while (itr.hasNext()) {
@@ -82,7 +55,7 @@ class View {
 	}
 
 	// get a random node from the array -- if array is empty, return null
-	public Node selectNode() {
+	public synchronized Node selectNode() {
 		if (this.nodes.size() == 0) {
 			return null;
 		}
@@ -127,7 +100,7 @@ class View {
 
 	// return a new View containing the first count elements of the
 	// nodes array of the current view
-	public View head(int count) {
+	private synchronized View head(int count) {
 		ArrayList<Node> retNodes = new ArrayList<Node>();
 		Iterator<Node> itr = this.nodes.iterator();
 		int i = 0;
@@ -142,8 +115,7 @@ class View {
 	}
 
 	// remove items with index from 0 to count
-	public synchronized void removeHead(int count) {
-
+	private synchronized void removeHead(int count) {
 		for (int i = 0; i < count; i++) {
 			if (i < this.nodes.size()) {
 				this.nodes.remove(i);
@@ -152,7 +124,7 @@ class View {
 	}
 
 	// append the nodes from another view to this view
-	public synchronized void append(View appendix) {
+	private synchronized void append(View appendix) {
 		this.nodes.addAll(appendix.nodes);
 	}
 
@@ -165,8 +137,7 @@ class View {
 		}
 	}
 
-	// TODO: documentation
-	public synchronized void removeDuplicates() {
+	private synchronized void removeDuplicates() {
 		for (int i = 0; i < this.nodes.size(); i++) {
 			for (int j = i + 1; j < this.nodes.size(); j++) {
 				if (this.nodes.get(i).compareAddressAndPort(this.nodes.get(j))) {
@@ -190,7 +161,7 @@ class View {
 	}
 
 	// remove count random nodes from view
-	public synchronized void removeRandom(int count) {
+	private synchronized void removeRandom(int count) {
 		while (count > 0) {
 			this.nodes.remove(this.rand.nextInt(this.nodes.size()));
 			count--;
@@ -198,7 +169,6 @@ class View {
 	}
 
 	public synchronized void select(View view, int h, int s, int c) {
-
 		this.append(view);
 		// this.printView();
 		this.removeDuplicates();
@@ -209,6 +179,35 @@ class View {
 		this.removeHead(Math.min(s, this.nodes.size() - c));
 		// this.printView();
 		this.removeRandom(this.nodes.size() - c);
+	}
 
+	public static void main(String[] args) throws UnknownHostException {
+		ArrayList<Node> test = new ArrayList<Node>();
+		for (int i = 0; i < 10; i++) {
+			String a = "" + i;
+			test.add(i, new Node("test" + a, 2 * i, 10 - i));
+		}
+
+		View v1 = new View(test);
+		ArrayList<Node> res = new ArrayList<Node>();
+		for (int i = 0; i < 10; i++) {
+			res.add(i, new Node("test" + i, 2 * i, i));
+		}
+
+		View v2 = new View(res);
+
+		v1.printView();
+		System.out.println("***********");
+		v2.printView();
+
+		v1.select(v2, 5, 6, 7);
+
+		v1.printView();
+		// v1.moveDownOldest(2);
+		// v1.printView();
+
+		System.out.println("Test select");
+		v1.select(new View(), Application.H, Application.S, Application.C);
+		v1.printView();
 	}
 }

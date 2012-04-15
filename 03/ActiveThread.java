@@ -1,13 +1,12 @@
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 class ActiveThread extends SuperThread {
-	private final boolean PUSH_MODE = false;
-	private final boolean PULL_MODE = false;
-
-	public static final String TRIGGER = "trigger";
+	private final boolean PUSH_MODE = true;
+	private final boolean PULL_MODE = true;
 
 	public ActiveThread(SocketManager socket, View view) {
 		super(socket, view);
@@ -15,7 +14,6 @@ class ActiveThread extends SuperThread {
 		System.out.println("ActiveThread constructed.");
 	}
 
-	@Override
 	public void run() {
 		while (this.isRunning()) {
 			try {
@@ -26,18 +24,24 @@ class ActiveThread extends SuperThread {
 					continue;
 				}
 
+				InetAddress n_address = InetAddress.getByName(n.getAddress());
+				int n_port = n.getPort();
+
 				if (this.PUSH_MODE) {
 					View buf_out = this.view.getBuffer(this.socket.getSocket()
-							.getPort());
-					sendData(this.socket.getSocket(), InetAddress.getByName(n
-							.getAddress()), n.getPort(), buf_out);
-				} else {
+							.getLocalPort());
+					sendData(this.socket.getSocket(), n_address, n_port,
+							buf_out);
+				} else
 					// send empty view to trigger response
-					sendData(this.socket.getSocket(), InetAddress.getByName(n
-							.getAddress()), n.getPort(), null);
-				}
+					sendData(this.socket.getSocket(), n_address, n_port, null);
+
 				if (this.PULL_MODE) {
-					View v = unpackData(this.receivePacket());
+					DatagramPacket packet = this.receivePacket();
+					if (packet == null)
+						continue;
+
+					View v = unpackData(packet);
 
 					this.view.select(v, Application.H, Application.S,
 							Application.C);

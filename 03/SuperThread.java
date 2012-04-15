@@ -17,6 +17,8 @@ public class SuperThread extends Thread {
 	private static final String delim = " ";
 	private static final String delimPaket = ":";
 
+	public static final String TRIGGER = "trigger";
+
 	SuperThread(SocketManager socket, View view) {
 		this.socket = socket;
 		this.view = view;

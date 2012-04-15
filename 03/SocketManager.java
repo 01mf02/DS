@@ -3,13 +3,13 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
-import java.util.LinkedList;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SocketManager extends Thread {
 
-	private Queue<DatagramPacket> pong_packets = new LinkedList<DatagramPacket>();
-	private Queue<DatagramPacket> node_packets = new LinkedList<DatagramPacket>();
+	private Queue<DatagramPacket> pong_packets = new ConcurrentLinkedQueue<DatagramPacket>();
+	private Queue<DatagramPacket> node_packets = new ConcurrentLinkedQueue<DatagramPacket>();
 	private DatagramSocket socket;
 	private boolean running = true;
 
@@ -22,11 +22,11 @@ public class SocketManager extends Thread {
 		return this.socket;
 	}
 
-	public DatagramPacket getPongPacket() {
+	public synchronized DatagramPacket getPongPacket() {
 		return findInPackets(pong_packets);
 	}
 
-	public DatagramPacket getNodePacket() {
+	public synchronized DatagramPacket getNodePacket() {
 		return findInPackets(node_packets);
 	}
 
@@ -46,7 +46,8 @@ public class SocketManager extends Thread {
 		running = false;
 	}
 
-	private DatagramPacket findInPackets(Queue<DatagramPacket> packets) {
+	private synchronized DatagramPacket findInPackets(
+			Queue<DatagramPacket> packets) {
 		return packets.poll();
 	}
 
